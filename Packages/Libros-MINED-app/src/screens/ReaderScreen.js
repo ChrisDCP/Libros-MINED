@@ -1,26 +1,22 @@
-import { StyleSheet, Dimensions } from "react-native";
-import Pdf from "react-native-pdf";
+import React, { useEffect } from "react";
+import { StyleSheet } from "react-native";
+import * as WebBrowser from "expo-web-browser";
 
-export default function ReaderScreen({ route }) {
+export default function ReaderScreen({ route, navigation }) {
   const { book } = route.params || {};
-  const source = {
-    uri: "http://www.pdf995.com/samples/pdf.pdf", // prueba temporal
-    cache: true,
-  };
 
-  return (
-    <Pdf
-      source={source}
-      style={styles.pdf}
-      onError={(error) => console.log(error)}
-    />
-  );
+  useEffect(() => {
+    if (book?.url) {
+      WebBrowser.openBrowserAsync(book.url).then(() => {
+        // Opcional: volver automáticamente a la lista después de cerrar el navegador
+        navigation.goBack();
+      });
+    }
+  }, []);
+
+  return null; // No muestra nada en la pantalla
 }
 
 const styles = StyleSheet.create({
-  pdf: {
-    flex: 1,
-    width: Dimensions.get("window").width,
-    height: Dimensions.get("window").height,
-  },
+  container: { flex: 1, justifyContent: "center", alignItems: "center" },
 });

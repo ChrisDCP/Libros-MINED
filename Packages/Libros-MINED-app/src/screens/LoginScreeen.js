@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, TextInput, Button, StyleSheet, Alert } from "react-native";
 import { signInWithEmailAndPassword, onAuthStateChanged, signOut } from "firebase/auth";
-import { auth } from "../services/FireBaseConfig";
+import { auth } from "../services/FirebaseConfig";
 
-// Para Google Sign-In
 import * as WebBrowser from "expo-web-browser";
 import * as Google from "expo-auth-session/providers/google";
 
@@ -13,7 +12,7 @@ export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  // Google Sign-In
+
   const [request, response, promptAsync] = Google.useAuthRequest({
     expoClientId: "432024090744-oms52ke7pdecmjgelth1rlabl0v2sen1.apps.googleusercontent.com",
     iosClientId: "432024090744-oms52ke7pdecmjgelth1rlabl0v2sen1.apps.googleusercontent.com",
@@ -25,7 +24,6 @@ export default function LoginScreen({ navigation }) {
     if (response?.type === "success") {
       const { authentication } = response;
       console.log("Google Token:", authentication.accessToken);
-      // Aquí luego conectamos con Firebase usando signInWithCredential
       navigation.replace("Home");
     }
   }, [response]);
@@ -39,7 +37,6 @@ export default function LoginScreen({ navigation }) {
     }
   };
 
-  // Mantener sesión
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) navigation.replace("Home");

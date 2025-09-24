@@ -1,16 +1,29 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, FlatList, TextInput, TouchableOpacity, StyleSheet } from "react-native";
-
-const mockBooks = [
-  { id: "1", title: "Matemáticas 7°", author: "MINED", subject: "Matemáticas" },
-  { id: "2", title: "Lengua y Literatura 8°", author: "MINED", subject: "Lengua" },
-  { id: "3", title: "Historia de Nicaragua 9°", author: "MINED", subject: "Historia" },
-];
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../services/FirebaseConfig";
 
 export default function BooksScreen({ navigation }) {
+  const [books, setBooks] = useState([]);
   const [search, setSearch] = useState("");
 
-  const filteredBooks = mockBooks.filter(
+  useEffect(() => {
+    const fetchBooks = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, "Books"));
+        const booksList = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setBooks(booksList);
+      } catch (error) {
+        console.error("Error al traer libros:", error);
+      }
+    };
+    fetchBooks();
+  }, []);
+
+  const filteredBooks = books.filter(
     (book) =>
       book.title.toLowerCase().includes(search.toLowerCase()) ||
       book.author.toLowerCase().includes(search.toLowerCase()) ||
@@ -36,7 +49,9 @@ export default function BooksScreen({ navigation }) {
             onPress={() => navigation.navigate("Reader", { book: item })}
           >
             <Text style={styles.bookTitle}>{item.title}</Text>
-            <Text style={styles.bookDetails}>{item.author} - {item.subject}</Text>
+            <Text style={styles.bookDetails}>
+              {item.author} - {item.subject}
+            </Text>
           </TouchableOpacity>
         )}
       />
